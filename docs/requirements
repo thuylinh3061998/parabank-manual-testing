@@ -1,0 +1,89 @@
+# Reverse Requirements – ParaBank Transfer Funds & Bill Pay
+
+**Người viết:** Mia Pham | **Ngày:** 30/10/2026
+**Môi trường:** https://parabank.parasoft.com – Chrome (Windows)
+**Dữ liệu test:** Acc 17451 (số dư đầu $415.50), Acc 17562 (số dư đầu $100.00)
+
+> Tài liệu này được viết bằng cách khám phá ứng dụng (không có spec gốc).
+> Ký hiệu ⚠️ = hành vi đáng ngờ, cần xác nhận với BA → ứng viên bug.
+
+---
+
+## 1. Open New Account
+
+| Mã | Quy tắc quan sát được |
+|---|---|
+| R-OA-01 | Khi mở tài khoản mới, hệ thống chuyển $100 từ tài khoản nguồn sang; tổng số dư không đổi ($515.50) |
+
+---
+
+## 2. Transfer Funds
+
+### 2.1 Các trường nhập
+| Trường | Kiểu | Bắt buộc? | Ghi chú |
+|---|---|---|---|
+| Amount | Text box | | |
+| From account # | Dropdown | | |
+| To account # | Dropdown | | |
+
+### 2.2 Quy tắc quan sát được
+| Mã | Dữ liệu thử | Kết quả thực tế | Đáng ngờ? |
+|---|---|---|---|
+| R-TF-01 | Amount = 10 | | |
+| R-TF-02 | Amount = 0.01 | | |
+| R-TF-03 | Amount = 0 | | |
+| R-TF-04 | Amount = -50 | | |
+| R-TF-05 | Amount = abc | | |
+| R-TF-06 | Amount để trống | | |
+| R-TF-07 | Amount = 10.999 | | |
+| R-TF-08 | Amount = 99999 (> số dư) | | |
+| R-TF-09 | From = To (cùng tài khoản) | | |
+| R-TF-10 | Bấm Transfer 2 lần liên tiếp | | |
+| R-TF-11 | Bấm Back sau khi chuyển | | |
+| R-TF-12 | Giao dịch hiển thị trong Find Transactions | | |
+
+---
+
+## 3. Bill Pay
+
+### 3.1 Các trường nhập
+| Trường | Bắt buộc? | Kiểm tra định dạng? |
+|---|---|---|
+| Payee Name | | |
+| Address | | |
+| City | | |
+| State | | |
+| Zip Code | | |
+| Phone # | | |
+| Account # | | |
+| Verify Account # | | |
+| Amount | | |
+| From account # | | |
+
+### 3.2 Quy tắc quan sát được
+| Mã | Dữ liệu thử | Kết quả thực tế | Đáng ngờ? |
+|---|---|---|---|
+| R-BP-01 | Điền đủ, hợp lệ, Amount = 20 | | |
+| R-BP-02 | Bỏ trống từng trường | | |
+| R-BP-03 | Account # ≠ Verify Account # | | |
+| R-BP-04 | Account # = abc | | |
+| R-BP-05 | Amount = -20 | | |
+| R-BP-06 | Amount = 0 | | |
+| R-BP-07 | Amount > số dư | | |
+| R-BP-08 | Phone = abc, Zip = abc | | |
+| R-BP-09 | Account # không tồn tại (99999) | | |
+
+---
+
+## 4. Câu hỏi làm rõ gửi BA
+
+1. Có hạn mức tối đa cho mỗi giao dịch chuyển tiền / mỗi ngày không?
+2. Số tiền tối thiểu được phép chuyển là bao nhiêu?
+3. Hệ thống có cho phép chuyển số tiền lớn hơn số dư khả dụng (thấu chi) không?
+4. Số tiền được phép tối đa mấy chữ số thập phân? Nếu nhập nhiều hơn thì làm tròn hay báo lỗi?
+5. Chuyển tiền giữa cùng một tài khoản có bị chặn không?
+6. Nếu người dùng bấm Transfer nhiều lần liên tiếp, hệ thống xử lý chống trùng giao dịch thế nào?
+7. Bill Pay tới số tài khoản không tồn tại thì tiền đi đâu? Có hoàn tiền không?
+8. Phone và Zip Code có quy tắc định dạng bắt buộc không?
+9. Có bước xác thực (OTP/mật khẩu) trước khi chuyển tiền / thanh toán không?
+10. Thông báo lỗi chuẩn cho từng trường hợp không hợp lệ là gì (để tester so sánh)?
